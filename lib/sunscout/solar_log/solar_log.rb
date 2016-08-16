@@ -11,15 +11,66 @@ module Sunscout
     #   puts "AC power: #{ sl.power_ac }W (DC: #{ sl.power_dc }W, Efficiency #{ (sl.efficiency*100).round(0) }%)"
     #   puts "Remaining power: #{ sl.power_available }W"
     class SolarLog
-      # @!attribute [r] time
-      #   @return [DateTime] Timestamp of the data.
+      # Timestamp of the data.
+      # @return [DateTime]
       attr_reader :time
-      attr_reader :power_ac, :power_dc, :power_total
-      attr_reader :voltage_ac, :voltage_dc
-      attr_reader :yield_day, :yield_yesterday, :yield_month, :yield_year, :yield_total
-      attr_reader :consumption_ac, :consumption_day, :consumption_yesterday, :consumption_month, :consumption_year, :consumption_total
+
+      # AC power in W
+      # @return [Fixnum]
+      attr_reader :power_ac
+      # DC power in W
+      # @return [Fixnum]
+      attr_reader :power_dc
+      # Maximum DC power in W
+      # @return [Fixnum]
+      attr_reader :power_total
+
+      # AC voltage in V
+      # @return [Fixnum]
+      attr_reader :voltage_ac
+      # DC voltage in V
+      # @return [Fixnum]
+      attr_reader :voltage_dc
+
+      # Today's yield in Wh
+      # @return [Fixnum]
+      attr_reader :yield_day
+      # Yesterday's yield in WH
+      # @return [Fixnum]
+      attr_reader :yield_yesterday 
+      # This month's yield in Wh
+      # @return [Fixnum]
+      attr_reader :yield_month 
+      # This year's yield in Wh
+      # @return [Fixnum]
+      attr_reader :yield_year
+      # Total yield in Wh
+      # @return [Fixnum]
+      attr_reader :yield_total
+
+      # Current consumption in W
+      # @return [Fixnum]
+      attr_reader :consumption_ac
+      # Today's consumption in Wh
+      # @return [Fixnum]
+      attr_reader :consumption_day 
+      # Yesterday's consumption in Wh
+      # @return [Fixnum]
+      attr_reader :consumption_yesterday 
+      # This month's consumption in Wh
+      # @return [Fixnum]
+      attr_reader :consumption_month 
+      # This year's consumption in Wh
+      # @return [Fixnum]
+      attr_reader :consumption_year 
+      # Total consumption in Wh
+      # @return [Fixnum]
+      attr_reader :consumption_total
 
       # Initialize a new instance of the class.
+      # 
+      # This also immediately queries data from the SolarLog API.
+      #
       # @param host [String] URI of the SolarLog web interface
       def initialize(host)
         client = Sunscout::SolarLog::Client.new(host)
@@ -99,7 +150,7 @@ module Sunscout
       # @example Usage >100%
       #   solar_log.consumption_ac #=> 200
       #   solar_log.power_ac #=> 100
-      #   solar_log.power_available #=> --100
+      #   solar_log.power_available #=> -100
       def power_available
         power_ac - consumption_ac
       end
