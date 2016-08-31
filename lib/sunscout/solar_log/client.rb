@@ -75,7 +75,7 @@ module Sunscout
       def parse_data(data)
         data = data.fetch('801').fetch('170')
 
-        out = {
+        {
           time:                  data.fetch('100'),
           power_ac:              data.fetch('101'),
           power_dc:              data.fetch('102'),
