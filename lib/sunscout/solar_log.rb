@@ -15,7 +15,7 @@ module Sunscout
   #   require 'sunscout'
   #   
   #   puts 'Querying data from SolarLog API'
-  #   solar_log = Sunscout::SolarLog::SolarLog.new('http://10.0.0.10')
+  #   solar_log = Sunscout::SolarLog::SolarLog.new('http://10.0.0.10', timezone: '+0500')
   #   
   #   puts "Data from: #{ solar_log.time.iso8601 }"
   #   puts "AC Power: #{ solar_log.power_ac }W (DC Power: #{ solar_log.power_dc }W, #{ (solar_log.efficiency*100).round(0) }% efficiency, #{ solar_log.alternator_loss }W loss)"

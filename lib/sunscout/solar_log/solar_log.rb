@@ -7,7 +7,7 @@ module Sunscout
     # High-level binding to the SolarLog HTTP API
     # @example Basic usage
     #   require 'sunscout'
-    #   sl = Sunscout::SolarLog::SolarLog.new('http://10.60.1.10')
+    #   sl = Sunscout::SolarLog::SolarLog.new('http://10.60.1.10', timezone: 'CEST')
     #   puts "AC power: #{ sl.power_ac }W (DC: #{ sl.power_dc }W, Efficiency #{ (sl.efficiency*100).round(0) }%)"
     #   puts "Remaining power: #{ sl.power_available }W"
     class SolarLog
@@ -72,11 +72,16 @@ module Sunscout
       # This also immediately queries data from the SolarLog API.
       #
       # @param host [String] URI of the SolarLog web interface
-      def initialize(host)
+      # @param timezone [String] Timezone (or offset) which the SolarLog station resides in.
+      #   If none is specified, assume UTC.
+      def initialize(host, timezone: '+0000')
         client = Sunscout::SolarLog::Client.new(host)
         data = client.get_data
 
-        @time = DateTime.strptime(data.fetch(:time), '%d.%m.%y %H:%M:%s')
+        # SolarLog returns the time a) without a timezone indicator and b) as whatever the station is configured.
+        # Hence, the user has to specify what timezone it is in - otherwise we'll just fall back to UTC.
+        time = "#{ data.fetch(:time) } #{ timezone }"
+        @time = DateTime.strptime(time, '%d.%m.%y %H:%M:%s %Z')
 
         @power_ac    = data.fetch :power_ac
         @power_dc    = data.fetch :power_dc
