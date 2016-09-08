@@ -15,28 +15,55 @@ module Sunscout
     #   c = Sunscout::SolarLog::Client.new('http://10.60.1.10')
     #   data = c.get_data()
     #   puts "Current power output: #{ data[:power_ac] }W"
+    #
+    # @example Proxying via SSH host
+    #   require 'sunscout'
+    #   require 'net/ssh/gateway'
+    #   gateway = Net::SSH::Gateway.new('jump.example.com', 'johndoe', password: 'hidden')
+    #   c = Sunscout::SolarLog::Client.new('http://192.168.1.10', ssh_gateway: gateway)
     class Client
       # Initialize a new instance of the class.
       # @param host [String] URI of the SolarLog web interface. 
-      def initialize(host)
+      # @param opts [Hash] Additional options
+      # @option opts [Net::SSH::Gateway] :ssh_gateway SSH gateway through which to proxy the request.
+      def initialize(host, opts = {})
         @host = host
+
+        @ssh_gateway = opts.fetch(:ssh_gateway, nil)
       end
 
       # Retrieve data from the HTTP API.
       # @return [Hash<Symbol, String|Integer>] Hash containing retrieved data
       def get_data
-        uri = build_uri
-        req = build_request(uri)
-        data = send_request(req, uri)
-
-        data
+        if @ssh_gateway
+          get_data_ssh
+        else
+          get_data_direct
+        end
       end
 
       private
+      def get_data_direct
+        uri = build_uri
+        req = build_request(uri)
+        send_request(req, uri)
+      end
+
+      def get_data_ssh
+        uri = build_uri
+        @ssh_gateway.open(uri.hostname, uri.port) do |port|
+          uri.hostname = '127.0.0.1'
+          uri.port     = port
+
+          req = build_request(uri)
+          send_request(req, uri)
+        end
+      end
+
       # Create URI of HTTP endpoint
       def build_uri
         URI("#{ @host }/#{ REQUEST_QUERY }")
-      end 
+      end
 
       # Build HTTP POST request
       # @param uri [URI] URI of HTTP endpoint
@@ -56,7 +83,7 @@ module Sunscout
           http.request(req)
         end
 
-        # Todo: Exception handling:
+        # TODO: Exception handling:
         #   - catching in case of failure (DNS, timeout, ...)
         #   - throwing in case of API failure
         case res

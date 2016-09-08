@@ -72,10 +72,15 @@ module Sunscout
       # This also immediately queries data from the SolarLog API.
       #
       # @param host [String] URI of the SolarLog web interface
-      # @param timezone [String] Timezone (or offset) which the SolarLog station resides in.
+      # @param opts [Hash] Additional options. 
+      #   If not consumed by this class itself, they are passed to {Client#initialize}
+      #   Be sure to check there for all possibilities!
+      # @option opts [String] :timezone Timezone (or offset) which the SolarLog station resides in.
       #   If none is specified, assume UTC.
-      def initialize(host, timezone: '+0000')
-        client = Sunscout::SolarLog::Client.new(host)
+      def initialize(host, opts = {})
+        timezone = opts.delete('timezone') || '+0000'
+
+        client = Sunscout::SolarLog::Client.new(host, opts)
         data = client.get_data
 
         # SolarLog returns the time a) without a timezone indicator and b) as whatever the station is configured.
