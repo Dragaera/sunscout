@@ -18,6 +18,12 @@ glance - what to expact from upgrading to a new version.
 
 ### Removed
 
+## [0.3.1] - 2016-09-10
+
+### Fixes
+
+- Properly use :timezone option for SolarLog class.
+
 ## [0.3.0] - 2016-09-08
 
 ### Added

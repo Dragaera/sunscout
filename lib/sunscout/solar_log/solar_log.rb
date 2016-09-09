@@ -78,7 +78,7 @@ module Sunscout
       # @option opts [String] :timezone Timezone (or offset) which the SolarLog station resides in.
       #   If none is specified, assume UTC.
       def initialize(host, opts = {})
-        timezone = opts.delete('timezone') || '+0000'
+        timezone = opts.delete(:timezone) || '+0000'
 
         client = Sunscout::SolarLog::Client.new(host, opts)
         data = client.get_data
